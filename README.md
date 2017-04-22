@@ -13,8 +13,8 @@ A program that helps you keep track of what you're populating your fridge with.
 * Desktop Application  IN PROGRESS
 * Web Application
 * Mobile Application
-         * Android
-         * iOS
+    * Android
+    * iOS
           
 ## Note to whoever is reading this
 
