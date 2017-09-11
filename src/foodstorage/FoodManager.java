@@ -10,6 +10,45 @@ public class FoodManager {
     private static ArrayList<StorageUnit> allStorageUnits = new ArrayList<>();
 
     private static final String COM_ADD_SU = "adds";
+    private static final String COM_DEL_SU = "dels";
+
+    public static void createStorageUnit(String name) {
+        for(StorageUnit i : allStorageUnits) {
+            if(i.getName().equals(name)) {
+                System.out.println("Storage unit already exists with this name!\n");
+                return;
+            }
+        }
+
+        StorageUnit newStorageUnit = new StorageUnit(name);
+        allStorageUnits.add(newStorageUnit);
+        System.out.println("New storage unit '" + name + "' created\n");
+    }
+
+    public static void removeStorageUnit(String name) {
+        for(StorageUnit i : allStorageUnits) {
+            if(i.getName().equalsIgnoreCase(name)) {
+                allStorageUnits.remove(i);
+                System.out.println("Storage unit '" + name + "' deleted\n");
+                return;
+            }
+        }
+        System.out.println("Storage unit does not exist with this name!\n");
+    }
+
+    public static void listAllStorageUnits() {
+        System.out.println("Current storage units:\n");
+        boolean empty = true;
+
+        for(StorageUnit i : allStorageUnits) {
+            System.out.println(i.getName());
+            empty = false;
+        }
+        if(empty) {
+            System.out.println("There are no created storage units.");
+        }
+        System.out.println();
+    }
 
     public static void main(String args[]) {
         BufferedReader userCommandBR =  new BufferedReader(new InputStreamReader(System.in));
@@ -23,16 +62,24 @@ public class FoodManager {
 
                 if(userCommand[0].equalsIgnoreCase("e")) {
                     break;
+
                 } else if(userCommand[0].equalsIgnoreCase("ls")) {
-                    System.out.println("Current storage units:\n");
+                    listAllStorageUnits();
+
                 } else if(userCommand[0].equalsIgnoreCase(COM_ADD_SU)) {
                     if(userCommand.length > 1) {
-                        StorageUnit newStorageUnit = new StorageUnit(userCommand[1]);
-                        allStorageUnits.add(newStorageUnit);
-                        System.out.println("New storage unit '" + userCommand[1] + "' created\n");
+                        createStorageUnit(userCommand[1]);
                     } else {
                         System.out.println("Storage unit requires a name!\n");
                     }
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_DEL_SU)) {
+                    if(userCommand.length > 1) {
+                        removeStorageUnit(userCommand[1]);
+                    } else {
+                        System.out.println("Name of storage unit required.\n");
+                    }
+
                 } else {
                     System.out.println("Invalid command. Please try again or type help for a list of commands.\n");
                 }
