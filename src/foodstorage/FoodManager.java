@@ -1,5 +1,7 @@
 package foodstorage;
 
+import savedata.SaveManager;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -12,17 +14,19 @@ public class FoodManager {
     private static final String COM_ADD_SU = "adds";
     private static final String COM_DEL_SU = "dels";
 
-    public static void createStorageUnit(String name) {
+    public static StorageUnit createStorageUnit(String name) {
         for(StorageUnit i : allStorageUnits) {
             if(i.getName().equals(name)) {
                 System.out.println("Storage unit already exists with this name!\n");
-                return;
+                return null;
             }
         }
 
         StorageUnit newStorageUnit = new StorageUnit(name);
         allStorageUnits.add(newStorageUnit);
         System.out.println("New storage unit '" + name + "' created\n");
+
+        return newStorageUnit;
     }
 
     public static void removeStorageUnit(String name) {
@@ -50,7 +54,9 @@ public class FoodManager {
         System.out.println();
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
+        System.out.println(System.getProperty("user.dir"));
+
         BufferedReader userCommandBR =  new BufferedReader(new InputStreamReader(System.in));
         String[] userCommand = new String[1];
         userCommand[0] = "-";
@@ -68,7 +74,12 @@ public class FoodManager {
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_ADD_SU)) {
                     if(userCommand.length > 1) {
-                        createStorageUnit(userCommand[1]);
+                        StorageUnit newUnit = createStorageUnit(userCommand[1]);
+                        if(newUnit != null) {
+                            SaveManager saveManager = new SaveManager();
+                            saveManager.saveToJson(newUnit);
+                        }
+
                     } else {
                         System.out.println("Storage unit requires a name!\n");
                     }
