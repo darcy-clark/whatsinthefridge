@@ -7,11 +7,16 @@ public class StorageUnit {
     private boolean atCapacity;
     FoodItem[] foodItems;
 
-    public StorageUnit(String name) {
+    public StorageUnit(String name, String storageType) {
         this.name = name;
+        this.storageType = storageType;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getStorageType() {
+        return storageType;
     }
 }

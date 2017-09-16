@@ -1,7 +1,10 @@
 package savedata;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import foodstorage.FoodItem;
 import foodstorage.StorageUnit;
 
@@ -14,10 +17,16 @@ public class SaveManager {
     private final static String path = "../savedata/savefiles/";
 
     protected ArrayList<StorageUnit> allStorageUnits;
-    private ObjectMapper mapper = new ObjectMapper();
-//test commit
-    public void saveToJson(StorageUnit unitToSave) throws IOException {
-        mapper.writeValue(new File(path + "test.json"), unitToSave);
+
+    public static void saveToJson(StorageUnit unitToSave) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File saveFile = new File(path + "saveFile.json");
+
+        ArrayNode jsonArray = (ArrayNode) mapper.readTree(saveFile);
+        ObjectNode jsonObject = mapper.valueToTree(unitToSave);
+        jsonArray.add(jsonObject);
+
+        mapper.writeValue(saveFile, jsonArray);
     }
 
     public void saveToJson(FoodItem foodToSave) {

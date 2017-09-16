@@ -6,37 +6,43 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class FoodManager {
 
-    private static ArrayList<StorageUnit> allStorageUnits = new ArrayList<>();
+    private static Map<String, StorageUnit> allStorageUnits = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     private static final String COM_ADD_SU = "adds";
     private static final String COM_DEL_SU = "dels";
 
-    public static StorageUnit createStorageUnit(String name) {
-        for(StorageUnit i : allStorageUnits) {
-            if(i.getName().equals(name)) {
-                System.out.println("Storage unit already exists with this name!\n");
-                return null;
-            }
+    public static StorageUnit createStorageUnit(String name) throws IOException {
+        return createStorageUnit(name, null);
+    }
+
+    public static StorageUnit createStorageUnit(String name, String storageType) throws IOException {
+        if(allStorageUnits.containsKey(name)) {
+            System.out.println("Storage unit already exists with this name!\n");
+            return null;
         }
 
-        StorageUnit newStorageUnit = new StorageUnit(name);
-        allStorageUnits.add(newStorageUnit);
+        StorageUnit newStorageUnit = new StorageUnit(name, storageType);
+        allStorageUnits.put(newStorageUnit.getName(), newStorageUnit);
+        SaveManager.saveToJson(newStorageUnit);
         System.out.println("New storage unit '" + name + "' created\n");
 
         return newStorageUnit;
     }
 
     public static void removeStorageUnit(String name) {
-        for(StorageUnit i : allStorageUnits) {
-            if(i.getName().equalsIgnoreCase(name)) {
-                allStorageUnits.remove(i);
-                System.out.println("Storage unit '" + name + "' deleted\n");
-                return;
-            }
+
+        if(allStorageUnits.containsKey(name)) {
+            allStorageUnits.remove(name);
+            System.out.println("Storage unit '" + name + "' deleted\n");
+            return;
         }
+
         System.out.println("Storage unit does not exist with this name!\n");
     }
 
@@ -44,7 +50,7 @@ public class FoodManager {
         System.out.println("Current storage units:\n");
         boolean empty = true;
 
-        for(StorageUnit i : allStorageUnits) {
+        for(StorageUnit i : allStorageUnits.values()) {
             System.out.println(i.getName());
             empty = false;
         }
@@ -73,13 +79,12 @@ public class FoodManager {
                     listAllStorageUnits();
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_ADD_SU)) {
-                    if(userCommand.length > 1) {
-                        StorageUnit newUnit = createStorageUnit(userCommand[1]);
-                        if(newUnit != null) {
-                            SaveManager saveManager = new SaveManager();
-                            saveManager.saveToJson(newUnit);
-                        }
-
+                    if(userCommand.length == 2) {
+                        createStorageUnit(userCommand[1]);
+                    } else if(userCommand.length == 3) {
+                        createStorageUnit(userCommand[1], userCommand[2]);
+                    } else if(userCommand.length > 3) {
+                        System.out.println("Too many arguments!\n");
                     } else {
                         System.out.println("Storage unit requires a name!\n");
                     }
