@@ -15,7 +15,7 @@ public class SaveManager {
 
     protected ArrayList<StorageUnit> allStorageUnits;
     private ObjectMapper mapper = new ObjectMapper();
-
+//test commit
     public void saveToJson(StorageUnit unitToSave) throws IOException {
         mapper.writeValue(new File(path + "test.json"), unitToSave);
     }
