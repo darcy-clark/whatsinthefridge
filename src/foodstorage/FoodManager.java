@@ -61,7 +61,7 @@ public class FoodManager {
     }
 
     public static void main(String args[]) throws IOException {
-        System.out.println(System.getProperty("user.dir"));
+        allStorageUnits = SaveManager.loadTreeMap();
 
         BufferedReader userCommandBR =  new BufferedReader(new InputStreamReader(System.in));
         String[] userCommand = new String[1];
