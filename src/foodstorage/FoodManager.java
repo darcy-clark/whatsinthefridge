@@ -5,8 +5,6 @@ import savedata.SaveManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -35,9 +33,10 @@ public class FoodManager {
         return newStorageUnit;
     }
 
-    public static void removeStorageUnit(String name) {
+    public static void removeStorageUnit(String name) throws IOException {
 
         if(allStorageUnits.containsKey(name)) {
+            SaveManager.deleteFromJson(allStorageUnits.get(name));
             allStorageUnits.remove(name);
             System.out.println("Storage unit '" + name + "' deleted\n");
             return;

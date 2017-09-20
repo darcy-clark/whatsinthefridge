@@ -22,9 +22,10 @@ public class SaveManager {
 
     public static Map<String, StorageUnit> loadTreeMap() throws IOException {
         File saveFile = new File(PATH);
-        Map<String, StorageUnit> initTreeMap;
+        //despite what intellij says, the constructor for initTreeMap is not redundant (see parameter)
+        Map<String, StorageUnit> initTreeMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         ObjectMapper mapper = new ObjectMapper();
-        initTreeMap = mapper.readValue(saveFile, new TypeReference<Map<String, StorageUnit>>(){});
+        initTreeMap = mapper.readValue(saveFile, new TypeReference<TreeMap<String, StorageUnit>>(){});
         return initTreeMap;
     }
 
@@ -49,6 +50,16 @@ public class SaveManager {
 
     public void retrieveFromJson(FoodItem foodToGet) {
 
+    }
+
+    public static void deleteFromJson(StorageUnit unitToDelete) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File saveFile = new File(PATH);
+
+        ObjectNode json = (ObjectNode) mapper.readTree(saveFile);
+        json.remove(unitToDelete.getName());
+
+        mapper.writeValue(saveFile, json);
     }
 
 }
