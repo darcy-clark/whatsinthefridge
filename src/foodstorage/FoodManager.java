@@ -14,6 +14,7 @@ public class FoodManager {
 
     private static final String COM_ADD_SU = "adds";
     private static final String COM_DEL_SU = "dels";
+    private static final String COM_GET_SU = "gets";
 
     public static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
@@ -39,6 +40,18 @@ public class FoodManager {
             SaveManager.deleteFromJson(allStorageUnits.get(name));
             allStorageUnits.remove(name);
             System.out.println("Storage unit '" + name + "' deleted\n");
+            return;
+        }
+
+        System.out.println("Storage unit does not exist with this name!\n");
+    }
+
+    public static void displayStorageUnit(String name) {
+        if(allStorageUnits.containsKey(name)) {
+            StorageUnit unitToDisplay = allStorageUnits.get(name);
+            System.out.println(unitToDisplay.getName() + "\n");
+            System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
+            System.out.println("Number of Food Items:\t" + unitToDisplay.getFoodItems().size());
             return;
         }
 
@@ -95,6 +108,12 @@ public class FoodManager {
                         System.out.println("Name of storage unit required.\n");
                     }
 
+                } else if(userCommand[0].equalsIgnoreCase(COM_GET_SU)) {
+                    if(userCommand.length > 1) {
+                        displayStorageUnit(userCommand[1]);
+                    } else {
+                        System.out.println("Name of storage unit required.\n");
+                    }
                 } else {
                     System.out.println("Invalid command. Please try again or type help for a list of commands.\n");
                 }

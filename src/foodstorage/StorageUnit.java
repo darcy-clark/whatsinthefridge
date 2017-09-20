@@ -1,11 +1,14 @@
 package foodstorage;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 public class StorageUnit {
 
     private String name;
     private String storageType;
     private boolean atCapacity;
-    FoodItem[] foodItems;
+    Map<String, FoodItem> foodItems = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public StorageUnit() {
 
@@ -30,5 +33,9 @@ public class StorageUnit {
 
     public void setStorageType(String storageType) {
         this.storageType = storageType;
+    }
+
+    public Map<String, FoodItem> getFoodItems() {
+        return foodItems;
     }
 }
