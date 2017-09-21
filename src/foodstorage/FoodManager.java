@@ -16,6 +16,8 @@ public class FoodManager {
     private static final String COM_DEL_SU = "dels";
     private static final String COM_GET_SU = "gets";
 
+    private static final String COM_ADD_FI = "addf";
+
     public static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
     }
@@ -51,7 +53,12 @@ public class FoodManager {
             StorageUnit unitToDisplay = allStorageUnits.get(name);
             System.out.println(unitToDisplay.getName() + "\n");
             System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
-            System.out.println("Number of Food Items:\t" + unitToDisplay.getFoodItems().size());
+            System.out.println("Number of Food Items:\t" + unitToDisplay.getFoodItems().size() + "\n");
+            System.out.println("List of Food Items:");
+            for(FoodItem i : unitToDisplay.getFoodItems().values()) {
+                System.out.println(i.getName());
+            }
+            System.out.println();
             return;
         }
 
@@ -70,6 +77,19 @@ public class FoodManager {
             System.out.println("There are no created storage units.");
         }
         System.out.println();
+    }
+
+    public static FoodItem createFoodItem(String name) {
+        return createFoodItem(name, "Free Space");
+    }
+
+    public static FoodItem createFoodItem(String name, String location) {
+        FoodItem newFoodItem = new FoodItem(name, location);
+        StorageUnit storageLocation = allStorageUnits.get(location);
+        storageLocation.addFoodItem(newFoodItem);
+        System.out.println("New food item '" + name + "' created\n");
+        //TODO: Save to JSON
+        return newFoodItem;
     }
 
     public static void main(String args[]) throws IOException {
@@ -109,11 +129,23 @@ public class FoodManager {
                     }
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_GET_SU)) {
-                    if(userCommand.length > 1) {
+                    if (userCommand.length > 1) {
                         displayStorageUnit(userCommand[1]);
                     } else {
                         System.out.println("Name of storage unit required.\n");
                     }
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_ADD_FI)) {
+                    if(userCommand.length == 2) {
+                        createFoodItem(userCommand[1]);
+                    } else if(userCommand.length == 3) {
+                        createFoodItem(userCommand[1], userCommand[2]);
+                    } else if(userCommand.length > 3) {
+                        System.out.println("Too many arguments!\n");
+                    } else {
+                        System.out.println("Food item requires a name!\n");
+                    }
+
                 } else {
                     System.out.println("Invalid command. Please try again or type help for a list of commands.\n");
                 }

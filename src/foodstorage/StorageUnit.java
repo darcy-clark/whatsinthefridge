@@ -23,12 +23,12 @@ public class StorageUnit {
         return name;
     }
 
-    public String getStorageType() {
-        return storageType;
-    }
-
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getStorageType() {
+        return storageType;
     }
 
     public void setStorageType(String storageType) {
@@ -37,5 +37,13 @@ public class StorageUnit {
 
     public Map<String, FoodItem> getFoodItems() {
         return foodItems;
+    }
+
+    public void setFoodItems(Map<String, FoodItem> foodItems) {
+        this.foodItems = foodItems;
+    }
+
+    public void addFoodItem(FoodItem foodItem) {
+        foodItems.put(foodItem.getUuid(), foodItem);
     }
 }
