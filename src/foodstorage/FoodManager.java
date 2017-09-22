@@ -20,6 +20,7 @@ public class FoodManager {
     private static final String COM_GET_SU = "gets";
 
     private static final String COM_ADD_FI = "addf";
+    private static final String COM_DEL_FI = "delf";
 
     public static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
@@ -40,7 +41,6 @@ public class FoodManager {
     }
 
     public static void removeStorageUnit(String name) throws IOException {
-
         if(allStorageUnits.containsKey(name)) {
             SaveManager.deleteFromJson(allStorageUnits.get(name));
             allStorageUnits.remove(name);
@@ -99,6 +99,21 @@ public class FoodManager {
         return newFoodItem;
     }
 
+    public static void removeFoodItem(String nameFood, String nameStorage) {
+        if(allStorageUnits.containsKey(nameStorage)) {
+            StorageUnit storageUnit = allStorageUnits.get(nameStorage);
+            ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
+            if(foodItemsWithSameName.size() == 1) {
+                storageUnit.deleteFoodItem(nameFood);
+                System.out.println("Food item " + nameFood + " deleted.\n");
+            } else {
+                System.out.println(foodItemsWithSameName.size() + " food items with this name exist, please specify ID.\n");
+            }
+            return;
+        }
+        System.out.println("Storage unit " + nameStorage + " does not exist!\n");
+    }
+
     public static void main(String args[]) throws IOException {
         allStorageUnits = SaveManager.loadTreeMap();
 
@@ -148,14 +163,27 @@ public class FoodManager {
                     }
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_ADD_FI)) {
-                    if(userCommand.length == 2) {
+                    if (userCommand.length == 2) {
                         createFoodItem(userCommand[1]);
-                    } else if(userCommand.length == 3) {
+                    } else if (userCommand.length == 3) {
                         createFoodItem(userCommand[1], userCommand[2]);
-                    } else if(userCommand.length > 3) {
+                    } else if (userCommand.length > 3) {
                         System.out.println("Too many arguments!\n");
                     } else {
                         System.out.println("Food item requires a name!\n");
+                    }
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_DEL_FI)) {
+                    if(userCommand.length == 2) {
+                        System.out.println("Please specify storage unit.\n");
+                    } else if(userCommand.length == 3) {
+                        removeFoodItem(userCommand[1], userCommand[2]);
+                    } else if(userCommand.length == 4) {
+
+                    } else if(userCommand.length > 3) {
+                        System.out.println("Too many arguments!\n");
+                    } else {
+                        System.out.println("Must specify food item to delete!\n");
                     }
 
                 } else {

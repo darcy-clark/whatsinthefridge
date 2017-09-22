@@ -46,11 +46,28 @@ public class StorageUnit {
 
     public void addFoodItem(FoodItem foodItem) {
         if(foodItems.containsKey(foodItem.getName())) {
-            foodItems.get(foodItem.getName()).add(foodItem);
+            ArrayList<FoodItem> foodItemsWithSameName = foodItems.get(foodItem.getName());
+            foodItemsWithSameName.add(foodItem);
+            foodItem.setId(foodItemsWithSameName.size());
         } else {
             ArrayList<FoodItem> mapArrayValue = new ArrayList<>();
             mapArrayValue.add(foodItem);
             foodItems.put(foodItem.getName(), mapArrayValue);
+            foodItem.setId(1);
+        }
+    }
+
+    public void deleteFoodItem(String foodItemName) {
+        foodItems.remove(foodItemName);
+    }
+
+    public void deleteFoodItem(FoodItem foodItem, int id) {
+        ArrayList<FoodItem> foodItemsWithSameName = foodItems.get(foodItem.getName());
+        for(FoodItem i : foodItemsWithSameName) {
+            if(i.getId() == id) {
+                foodItemsWithSameName.remove(i);
+                return;
+            }
         }
     }
 }
