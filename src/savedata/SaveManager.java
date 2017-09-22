@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import foodstorage.FoodItem;
 import foodstorage.StorageUnit;
@@ -18,7 +19,7 @@ import java.util.TreeMap;
 public class SaveManager {
 
     private final static String PATH = "../savedata/savefiles/saveFile.json";
-
+    private final static String FOOD_MAP_KEY = "foodItems";
 
     public static Map<String, StorageUnit> loadTreeMap() throws IOException {
         File saveFile = new File(PATH);
@@ -40,8 +41,26 @@ public class SaveManager {
         mapper.writeValue(saveFile, json);
     }
 
-    public void saveToJson(FoodItem foodToSave) {
+    public static void saveToJson(FoodItem foodToSave) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        File saveFile = new File(PATH);
 
+        ObjectNode json = (ObjectNode) mapper.readTree(saveFile);
+        ObjectNode foodMap = (ObjectNode) json.get(foodToSave.getLocation()).get(FOOD_MAP_KEY);
+        ObjectNode foodItem = mapper.valueToTree(foodToSave);
+
+        ArrayNode foodWithSameName;
+        if(foodMap.get(foodToSave.getName()) == null) {
+            JsonNodeFactory nf = JsonNodeFactory.instance;
+            foodWithSameName = new ArrayNode(nf);
+            foodMap.set(foodToSave.getName(), foodWithSameName);
+            foodWithSameName.add(foodItem);
+        } else {
+            foodWithSameName = (ArrayNode) foodMap.get(foodToSave.getName());
+            foodWithSameName.add(foodItem);
+        }
+
+        mapper.writeValue(saveFile, json);
     }
 
     public void retrieveFromJson(StorageUnit unitToGet) {

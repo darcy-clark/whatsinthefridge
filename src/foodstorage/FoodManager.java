@@ -5,12 +5,15 @@ import savedata.SaveManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class FoodManager {
 
     private static Map<String, StorageUnit> allStorageUnits = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+
+    private static final String FREE_SPACE = "Free Space";
 
     private static final String COM_ADD_SU = "adds";
     private static final String COM_DEL_SU = "dels";
@@ -55,8 +58,10 @@ public class FoodManager {
             System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
             System.out.println("Number of Food Items:\t" + unitToDisplay.getFoodItems().size() + "\n");
             System.out.println("List of Food Items:");
-            for(FoodItem i : unitToDisplay.getFoodItems().values()) {
-                System.out.println(i.getName());
+            for(ArrayList<FoodItem> i : unitToDisplay.getFoodItems().values()) {
+                for(FoodItem j : i) {
+                    System.out.println(j.getName());
+                }
             }
             System.out.println();
             return;
@@ -70,8 +75,10 @@ public class FoodManager {
         boolean empty = true;
 
         for(StorageUnit i : allStorageUnits.values()) {
-            System.out.println(i.getName());
-            empty = false;
+            if(!i.getName().equals(FREE_SPACE)) {
+                System.out.println(i.getName());
+                empty = false;
+            }
         }
         if(empty) {
             System.out.println("There are no created storage units.");
@@ -79,21 +86,26 @@ public class FoodManager {
         System.out.println();
     }
 
-    public static FoodItem createFoodItem(String name) {
-        return createFoodItem(name, "Free Space");
+    public static FoodItem createFoodItem(String name) throws IOException {
+        return createFoodItem(name, FREE_SPACE);
     }
 
-    public static FoodItem createFoodItem(String name, String location) {
+    public static FoodItem createFoodItem(String name, String location) throws IOException {
         FoodItem newFoodItem = new FoodItem(name, location);
         StorageUnit storageLocation = allStorageUnits.get(location);
         storageLocation.addFoodItem(newFoodItem);
         System.out.println("New food item '" + name + "' created\n");
-        //TODO: Save to JSON
+        SaveManager.saveToJson(newFoodItem);
         return newFoodItem;
     }
 
     public static void main(String args[]) throws IOException {
         allStorageUnits = SaveManager.loadTreeMap();
+
+        //Safe-guard in case I delete the save file contents
+        if(!allStorageUnits.containsKey(FREE_SPACE)) {
+            createStorageUnit(FREE_SPACE);
+        }
 
         BufferedReader userCommandBR =  new BufferedReader(new InputStreamReader(System.in));
         String[] userCommand = new String[1];

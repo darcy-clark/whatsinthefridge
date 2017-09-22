@@ -1,5 +1,6 @@
 package foodstorage;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -8,7 +9,7 @@ public class StorageUnit {
     private String name;
     private String storageType;
     private boolean atCapacity;
-    Map<String, FoodItem> foodItems = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    Map<String, ArrayList<FoodItem>> foodItems = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     public StorageUnit() {
 
@@ -35,15 +36,21 @@ public class StorageUnit {
         this.storageType = storageType;
     }
 
-    public Map<String, FoodItem> getFoodItems() {
+    public Map<String, ArrayList<FoodItem>> getFoodItems() {
         return foodItems;
     }
 
-    public void setFoodItems(Map<String, FoodItem> foodItems) {
+    public void setFoodItems(Map<String, ArrayList<FoodItem>> foodItems) {
         this.foodItems = foodItems;
     }
 
     public void addFoodItem(FoodItem foodItem) {
-        foodItems.put(foodItem.getUuid(), foodItem);
+        if(foodItems.containsKey(foodItem.getName())) {
+            foodItems.get(foodItem.getName()).add(foodItem);
+        } else {
+            ArrayList<FoodItem> mapArrayValue = new ArrayList<>();
+            mapArrayValue.add(foodItem);
+            foodItems.put(foodItem.getName(), mapArrayValue);
+        }
     }
 }
