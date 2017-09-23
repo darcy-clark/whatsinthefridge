@@ -1,1 +1,1 @@
-{"Free Space":{"name":"Free Space","storageType":null,"foodItems":{}},"wow":{"name":"wow","storageType":null,"foodItems":{"yay":[{"name":"yay","location":"wow","id":1},{"name":"yay","location":"wow","id":2}],"koom":[{"name":"koom","location":"wow","id":1}],"yyz":[{"name":"yyz","location":"wow","id":1}]}}}
+{"Free Space":{"name":"Free Space","storageType":null,"foodItems":{}},"foo":{"name":"foo","storageType":null,"foodItems":{"f":[{"name":"f","location":"foo","id":1},{"name":"f","location":"foo","id":2}]}}}

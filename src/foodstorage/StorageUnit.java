@@ -61,13 +61,12 @@ public class StorageUnit {
         foodItems.remove(foodItemName);
     }
 
-    public void deleteFoodItem(FoodItem foodItem, int id) {
-        ArrayList<FoodItem> foodItemsWithSameName = foodItems.get(foodItem.getName());
-        for(FoodItem i : foodItemsWithSameName) {
-            if(i.getId() == id) {
-                foodItemsWithSameName.remove(i);
-                return;
-            }
+    public void deleteFoodItem(String foodItemName, int id) {
+        ArrayList<FoodItem> foodItemsWithSameName = foodItems.get(foodItemName);
+        foodItemsWithSameName.remove(id - 1);
+        for(int i = id - 1; i < foodItemsWithSameName.size(); i++) {
+            int currentId = foodItemsWithSameName.get(i).getId();
+            foodItemsWithSameName.get(i).setId(currentId - 1);
         }
     }
 }

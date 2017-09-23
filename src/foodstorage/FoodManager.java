@@ -60,7 +60,7 @@ public class FoodManager {
             System.out.println("List of Food Items:");
             for(ArrayList<FoodItem> i : unitToDisplay.getFoodItems().values()) {
                 for(FoodItem j : i) {
-                    System.out.println(j.getName());
+                    System.out.println(j.getName() + "\t" + j.getId());
                 }
             }
             System.out.println();
@@ -99,19 +99,48 @@ public class FoodManager {
         return newFoodItem;
     }
 
-    public static void removeFoodItem(String nameFood, String nameStorage) {
+    public static void removeFoodItem(String nameFood, String nameStorage) throws IOException {
         if(allStorageUnits.containsKey(nameStorage)) {
             StorageUnit storageUnit = allStorageUnits.get(nameStorage);
             ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
-            if(foodItemsWithSameName.size() == 1) {
+            if(foodItemsWithSameName != null && foodItemsWithSameName.size() == 1) {
+                SaveManager.deleteFromJson(foodItemsWithSameName.get(0));
                 storageUnit.deleteFoodItem(nameFood);
                 System.out.println("Food item " + nameFood + " deleted.\n");
+            } else if(foodItemsWithSameName == null) {
+                System.out.println("Food item " + nameFood + " does not exist.\n");
             } else {
                 System.out.println(foodItemsWithSameName.size() + " food items with this name exist, please specify ID.\n");
             }
             return;
         }
         System.out.println("Storage unit " + nameStorage + " does not exist!\n");
+    }
+
+    public static void removeFoodItem(String nameFood, int id, String nameStorage) throws IOException {
+        if(allStorageUnits.containsKey(nameStorage)) {
+            StorageUnit storageUnit = allStorageUnits.get(nameStorage);
+            ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
+            if(foodItemsWithSameName != null && foodItemsWithSameName.size() >= id) {
+                storageUnit.deleteFoodItem(nameFood, id);
+                SaveManager.deleteFromJson(foodItemsWithSameName.get(0), id, storageUnit); //must come after since rewriting
+                System.out.println("Food item " + nameFood + " " + id + " deleted.\n");
+            } else if(foodItemsWithSameName == null) {
+                System.out.println("Food item " + nameFood + " does not exist.\n");
+            } else {
+                System.out.println(nameFood + " with ID " + id + " does not exist!\n");
+            }
+            return;
+        }
+        System.out.println("Storage unit " + nameStorage + " does not exist!\n");
+    }
+
+    public static void displayFoodItem(String foodName) {
+
+    }
+
+    public static void displayFoodItem(String foodName, String idString) {
+
     }
 
     public static void main(String args[]) throws IOException {
@@ -179,7 +208,13 @@ public class FoodManager {
                     } else if(userCommand.length == 3) {
                         removeFoodItem(userCommand[1], userCommand[2]);
                     } else if(userCommand.length == 4) {
-
+                        int id;
+                        try{
+                            id = Integer.parseInt(userCommand[2]);
+                            removeFoodItem(userCommand[1], id, userCommand[3]);
+                        } catch(NumberFormatException i) {
+                            System.out.println("ID must be a number.\n");
+                        }
                     } else if(userCommand.length > 3) {
                         System.out.println("Too many arguments!\n");
                     } else {
