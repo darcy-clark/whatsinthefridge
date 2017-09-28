@@ -82,21 +82,21 @@ public class SaveManager {
     }
 
     public static void deleteFromJson(FoodItem itemToDelete) throws IOException {
-        deleteFromJson(itemToDelete, -1, null);
+        deleteFromJson(itemToDelete, false, null);
     }
 
-    public static void deleteFromJson(FoodItem itemToDelete, int id, StorageUnit unit) throws IOException {
+    public static void deleteFromJson(FoodItem itemToDelete, boolean id, StorageUnit unit) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         File saveFile = new File(PATH);
 
         ObjectNode json = (ObjectNode) mapper.readTree(saveFile);
         ObjectNode foodItems = (ObjectNode) json.get(itemToDelete.getLocation()).get(FOOD_MAP_KEY);
-        if(id == -1) {
-            foodItems.remove(itemToDelete.getName());
-        } else {
+        if(id) {
             ArrayList<FoodItem> listOfFood = unit.getFoodItems().get(itemToDelete.getName());
             ArrayNode foodArray = mapper.valueToTree(listOfFood);
             foodItems.set(itemToDelete.getName(), foodArray);
+        } else {
+            foodItems.remove(itemToDelete.getName());
         }
 
         mapper.writeValue(saveFile, json);

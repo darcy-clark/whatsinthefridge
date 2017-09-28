@@ -21,6 +21,7 @@ public class FoodManager {
 
     private static final String COM_ADD_FI = "addf";
     private static final String COM_DEL_FI = "delf";
+    private static final String COM_GET_FI = "getf";
 
     public static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
@@ -56,11 +57,11 @@ public class FoodManager {
             StorageUnit unitToDisplay = allStorageUnits.get(name);
             System.out.println(unitToDisplay.getName() + "\n");
             System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
-            System.out.println("Number of Food Items:\t" + unitToDisplay.getFoodItems().size() + "\n");
+            System.out.println("Number of Food Items:\t" + unitToDisplay.getNumberOfItems() + "\n");
             System.out.println("List of Food Items:");
             for(ArrayList<FoodItem> i : unitToDisplay.getFoodItems().values()) {
                 for(FoodItem j : i) {
-                    System.out.println(j.getName() + "\t" + j.getId());
+                    System.out.printf("%-20s%s%n", j.getName(), j.getId());
                 }
             }
             System.out.println();
@@ -103,14 +104,16 @@ public class FoodManager {
         if(allStorageUnits.containsKey(nameStorage)) {
             StorageUnit storageUnit = allStorageUnits.get(nameStorage);
             ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
-            if(foodItemsWithSameName != null && foodItemsWithSameName.size() == 1) {
-                SaveManager.deleteFromJson(foodItemsWithSameName.get(0));
-                storageUnit.deleteFoodItem(nameFood);
-                System.out.println("Food item " + nameFood + " deleted.\n");
-            } else if(foodItemsWithSameName == null) {
-                System.out.println("Food item " + nameFood + " does not exist.\n");
+            if(foodItemsWithSameName != null) {
+                if(foodItemsWithSameName.size() == 1) {
+                    SaveManager.deleteFromJson(foodItemsWithSameName.get(0));
+                    storageUnit.deleteFoodItem(nameFood);
+                    System.out.println("Food item " + nameFood + " deleted.\n");
+                } else {
+                    System.out.println(foodItemsWithSameName.size() + " food items with this name exist, please specify ID.\n");
+                }
             } else {
-                System.out.println(foodItemsWithSameName.size() + " food items with this name exist, please specify ID.\n");
+                System.out.println("Food item " + nameFood + " does not exist.\n");
             }
             return;
         }
@@ -121,25 +124,57 @@ public class FoodManager {
         if(allStorageUnits.containsKey(nameStorage)) {
             StorageUnit storageUnit = allStorageUnits.get(nameStorage);
             ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
-            if(foodItemsWithSameName != null && foodItemsWithSameName.size() >= id) {
-                storageUnit.deleteFoodItem(nameFood, id);
-                SaveManager.deleteFromJson(foodItemsWithSameName.get(0), id, storageUnit); //must come after since rewriting
-                System.out.println("Food item " + nameFood + " " + id + " deleted.\n");
-            } else if(foodItemsWithSameName == null) {
-                System.out.println("Food item " + nameFood + " does not exist.\n");
+            if(foodItemsWithSameName != null) {
+                if(foodItemsWithSameName.size() >= id) {
+                    storageUnit.deleteFoodItem(nameFood, id);
+                    SaveManager.deleteFromJson(foodItemsWithSameName.get(0), true, storageUnit); //must come after since rewriting
+                    System.out.println("Food item " + nameFood + " " + id + " deleted.\n");
+                } else {
+                    System.out.println(nameFood + " with ID " + id + " does not exist!\n");
+                }
             } else {
-                System.out.println(nameFood + " with ID " + id + " does not exist!\n");
+                System.out.println("Food item " + nameFood + " does not exist.\n");
             }
             return;
         }
         System.out.println("Storage unit " + nameStorage + " does not exist!\n");
     }
 
-    public static void displayFoodItem(String foodName) {
+    public static void displayFoodItem(FoodItem item) {
 
     }
 
-    public static void displayFoodItem(String foodName, String idString) {
+    public static void displayFoodItem(String foodName) {
+        ArrayList<FoodItem> itemsFoundList = new ArrayList<>();
+        for(StorageUnit unit : allStorageUnits.values()) {
+            if(unit.getFoodItems().containsKey(foodName)) {
+                for(FoodItem i : unit.getFoodItems().get(foodName)) {
+                    itemsFoundList.add(i);
+                }
+            }
+        }
+
+        if(itemsFoundList.size() == 1) {
+            displayFoodItem(itemsFoundList.get(0));
+        } else if(itemsFoundList.size() > 1) {
+            System.out.println(itemsFoundList.size() + " food items found:");
+            for(FoodItem i : itemsFoundList) {
+                System.out.printf("%-20s%-4s%s%n", i.getName(), i.getId(), i.getLocation());
+            }
+        } else {
+            System.out.println("Food item " + foodName + " does not exist.\n");
+        }
+    }
+
+    public static void displayFoodItem(String foodName, int id) {
+
+    }
+
+    public static void displayFoodItem(String foodName, String storageName) {
+
+    }
+
+    public static void displayFoodItem(String foodName, int id, String storageName) {
 
     }
 
@@ -219,6 +254,15 @@ public class FoodManager {
                         System.out.println("Too many arguments!\n");
                     } else {
                         System.out.println("Must specify food item to delete!\n");
+                    }
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_GET_FI)) {
+                    if(userCommand.length == 2) {
+                        displayFoodItem(userCommand[1]);
+                    } else if(userCommand.length == 3) {
+
+                    } else if(userCommand.length == 4) {
+
                     }
 
                 } else {

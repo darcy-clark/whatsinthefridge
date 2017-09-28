@@ -10,6 +10,7 @@ public class StorageUnit {
     private String storageType;
     private boolean atCapacity;
     Map<String, ArrayList<FoodItem>> foodItems = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private int numberOfItems;
 
     public StorageUnit() {
 
@@ -44,6 +45,14 @@ public class StorageUnit {
         this.foodItems = foodItems;
     }
 
+    public int getNumberOfItems() {
+        return numberOfItems;
+    }
+
+    public void setNumberOfItems(int numberOfItems) {
+        this.numberOfItems = numberOfItems;
+    }
+
     public void addFoodItem(FoodItem foodItem) {
         if(foodItems.containsKey(foodItem.getName())) {
             ArrayList<FoodItem> foodItemsWithSameName = foodItems.get(foodItem.getName());
@@ -55,10 +64,12 @@ public class StorageUnit {
             foodItems.put(foodItem.getName(), mapArrayValue);
             foodItem.setId(1);
         }
+        numberOfItems++;
     }
 
     public void deleteFoodItem(String foodItemName) {
         foodItems.remove(foodItemName);
+        numberOfItems--;
     }
 
     public void deleteFoodItem(String foodItemName, int id) {
@@ -68,5 +79,6 @@ public class StorageUnit {
             int currentId = foodItemsWithSameName.get(i).getId();
             foodItemsWithSameName.get(i).setId(currentId - 1);
         }
+        numberOfItems--;
     }
 }

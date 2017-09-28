@@ -1,11 +1,14 @@
 package foodstorage;
 
+import java.util.Date;
+
 public class FoodItem {
 
     private String name;
     private String location;
     private int quantity;
     private int id;
+    private Date expiryDate;
 
     public FoodItem() {
 
