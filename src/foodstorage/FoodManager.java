@@ -23,11 +23,11 @@ public class FoodManager {
     private static final String COM_DEL_FI = "delf";
     private static final String COM_GET_FI = "getf";
 
-    public static StorageUnit createStorageUnit(String name) throws IOException {
+    private static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
     }
 
-    public static StorageUnit createStorageUnit(String name, String storageType) throws IOException {
+    private static StorageUnit createStorageUnit(String name, String storageType) throws IOException {
         if(allStorageUnits.containsKey(name)) {
             System.out.println("Storage unit already exists with this name!\n");
             return null;
@@ -41,7 +41,7 @@ public class FoodManager {
         return newStorageUnit;
     }
 
-    public static void removeStorageUnit(String name) throws IOException {
+    private static void removeStorageUnit(String name) throws IOException {
         if(allStorageUnits.containsKey(name)) {
             SaveManager.deleteFromJson(allStorageUnits.get(name));
             allStorageUnits.remove(name);
@@ -52,10 +52,10 @@ public class FoodManager {
         System.out.println("Storage unit does not exist with this name!\n");
     }
 
-    public static void displayStorageUnit(String name) {
+    private static void displayStorageUnit(String name) {
         if(allStorageUnits.containsKey(name)) {
             StorageUnit unitToDisplay = allStorageUnits.get(name);
-            System.out.println(unitToDisplay.getName() + "\n");
+            System.out.println("\n" + unitToDisplay.getName());
             System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
             System.out.println("Number of Food Items:\t" + unitToDisplay.getNumberOfItems() + "\n");
             System.out.println("List of Food Items:");
@@ -71,7 +71,7 @@ public class FoodManager {
         System.out.println("Storage unit does not exist with this name!\n");
     }
 
-    public static void listAllStorageUnits() {
+    private static void listAllStorageUnits() {
         System.out.println("Current storage units:\n");
         boolean empty = true;
 
@@ -87,11 +87,11 @@ public class FoodManager {
         System.out.println();
     }
 
-    public static FoodItem createFoodItem(String name) throws IOException {
+    private static FoodItem createFoodItem(String name) throws IOException {
         return createFoodItem(name, FREE_SPACE);
     }
 
-    public static FoodItem createFoodItem(String name, String location) throws IOException {
+    private static FoodItem createFoodItem(String name, String location) throws IOException {
         FoodItem newFoodItem = new FoodItem(name, location);
         StorageUnit storageLocation = allStorageUnits.get(location);
         storageLocation.addFoodItem(newFoodItem);
@@ -100,7 +100,7 @@ public class FoodManager {
         return newFoodItem;
     }
 
-    public static void removeFoodItem(String nameFood, String nameStorage) throws IOException {
+    private static void removeFoodItem(String nameFood, String nameStorage) throws IOException {
         if(allStorageUnits.containsKey(nameStorage)) {
             StorageUnit storageUnit = allStorageUnits.get(nameStorage);
             ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
@@ -120,7 +120,7 @@ public class FoodManager {
         System.out.println("Storage unit " + nameStorage + " does not exist!\n");
     }
 
-    public static void removeFoodItem(String nameFood, int id, String nameStorage) throws IOException {
+    private static void removeFoodItem(String nameFood, int id, String nameStorage) throws IOException {
         if(allStorageUnits.containsKey(nameStorage)) {
             StorageUnit storageUnit = allStorageUnits.get(nameStorage);
             ArrayList<FoodItem> foodItemsWithSameName = storageUnit.getFoodItems().get(nameFood);
@@ -140,48 +140,96 @@ public class FoodManager {
         System.out.println("Storage unit " + nameStorage + " does not exist!\n");
     }
 
-    public static void displayFoodItem(FoodItem item) {
-
+    private static void displayFoodItem(FoodItem item) {
+        System.out.println("\n" + item.getName());
+        System.out.printf("%-13s%s%n", "Location:", item.getLocation());
+        System.out.printf("%-13s%s%n", "ID:", item.getId());
+        System.out.println();
     }
 
-    public static void displayFoodItem(String foodName) {
+    private static void displayFoodItem(String foodName) {
         ArrayList<FoodItem> itemsFoundList = new ArrayList<>();
         for(StorageUnit unit : allStorageUnits.values()) {
             if(unit.getFoodItems().containsKey(foodName)) {
-                for(FoodItem i : unit.getFoodItems().get(foodName)) {
-                    itemsFoundList.add(i);
-                }
+                itemsFoundList.addAll(unit.getFoodItems().get(foodName));
             }
         }
 
         if(itemsFoundList.size() == 1) {
             displayFoodItem(itemsFoundList.get(0));
         } else if(itemsFoundList.size() > 1) {
-            System.out.println(itemsFoundList.size() + " food items found:");
-            for(FoodItem i : itemsFoundList) {
-                System.out.printf("%-20s%-4s%s%n", i.getName(), i.getId(), i.getLocation());
-            }
+            listFoodItemsFound(itemsFoundList);
         } else {
             System.out.println("Food item " + foodName + " does not exist.\n");
         }
     }
 
-    public static void displayFoodItem(String foodName, int id) {
+    private static void displayFoodItem(String foodName, int id) {
+        ArrayList<FoodItem> itemsFoundList = new ArrayList<>();
+        for(StorageUnit unit : allStorageUnits.values()) {
+            if(unit.getFoodItems().containsKey(foodName)
+                    && unit.getFoodItems().get(foodName).size() >= id) {
+                itemsFoundList.add(unit.getFoodItems().get(foodName).get(id - 1));
+            }
+        }
 
+        if(itemsFoundList.size() == 1) {
+            displayFoodItem(itemsFoundList.get(0));
+        } else if(itemsFoundList.size() > 1) {
+            listFoodItemsFound(itemsFoundList);
+        } else {
+            System.out.println("Food item " + foodName + "with ID" + id + " does not exist.\n");
+        }
     }
 
-    public static void displayFoodItem(String foodName, String storageName) {
-
+    private static void displayFoodItem(String foodName, String storageName) {
+        StorageUnit unitToCheck = allStorageUnits.get(storageName);
+        if(unitToCheck == null) {
+            System.out.println("Storage unit " + storageName + " does not exist.\n");
+            return;
+        }
+        ArrayList<FoodItem> foodWithSameName = unitToCheck.getFoodItems().get(foodName);
+        if(foodWithSameName == null) {
+            System.out.println("Food item " + foodName + " does not exist in " + storageName + "\n");
+        } else if(foodWithSameName.size() == 1) {
+            displayFoodItem(foodWithSameName.get(0));
+        } else {
+            listFoodItemsFound(foodWithSameName);
+        }
     }
 
-    public static void displayFoodItem(String foodName, int id, String storageName) {
+    private static void displayFoodItem(String foodName, int id, String storageName) {
+        StorageUnit unitToCheck = allStorageUnits.get(storageName);
+        if(unitToCheck != null) {
+            ArrayList<FoodItem> listOfFood = unitToCheck.getFoodItems().get(foodName);
+            if(listOfFood != null) {
+                if(listOfFood.size() >= id) {
+                    displayFoodItem(listOfFood.get(id - 1));
+                } else {
+                    System.out.println("Food item " + foodName + " with ID " + id + " in storage unit "
+                            + storageName + " does not exist.\n");
+                }
+            } else {
+                System.out.println("Food item " + foodName + " in storage unit " + storageName +
+                        " does not exist.\n");
+            }
+        } else {
+            System.out.println("Storage unit " + storageName + " does not exist.\n");
+        }
+    }
 
+    private static void listFoodItemsFound(ArrayList<FoodItem> foodItemsFound) {
+        System.out.println(foodItemsFound.size() + " food items found:");
+        for(FoodItem i : foodItemsFound) {
+            System.out.printf("%-20s%-4s%s%n", i.getName(), i.getId(), i.getLocation());
+        }
+        System.out.println();
     }
 
     public static void main(String args[]) throws IOException {
         allStorageUnits = SaveManager.loadTreeMap();
 
-        //Safe-guard in case I delete the save file contents
+        // Safe-guard in case I delete the save file contents
         if(!allStorageUnits.containsKey(FREE_SPACE)) {
             createStorageUnit(FREE_SPACE);
         }
@@ -260,9 +308,25 @@ public class FoodManager {
                     if(userCommand.length == 2) {
                         displayFoodItem(userCommand[1]);
                     } else if(userCommand.length == 3) {
-
+                        int id;
+                        try{
+                            id = Integer.parseInt(userCommand[2]);
+                            displayFoodItem(userCommand[1], id);
+                        } catch(NumberFormatException i) {
+                            displayFoodItem(userCommand[1], userCommand[2]);
+                        }
                     } else if(userCommand.length == 4) {
-
+                        int id;
+                        try{
+                            id = Integer.parseInt(userCommand[2]);
+                            displayFoodItem(userCommand[1], id, userCommand[3]);
+                        } catch(NumberFormatException i) {
+                            System.out.println("ID must be a number.\n");
+                        }
+                    } else if(userCommand.length > 4) {
+                        System.out.println("Too many arguments!\n");
+                    } else {
+                        System.out.println("Must specify food item to display!\n");
                     }
 
                 } else {
