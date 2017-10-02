@@ -13,7 +13,7 @@ public class FoodManager {
 
     private static Map<String, StorageUnit> allStorageUnits = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-    private static final String FREE_SPACE = "Free Space";
+    private static final String FREE_SPACE = "Open";
 
     private static final String COM_ADD_SU = "adds";
     private static final String COM_DEL_SU = "dels";
@@ -22,6 +22,39 @@ public class FoodManager {
     private static final String COM_ADD_FI = "addf";
     private static final String COM_DEL_FI = "delf";
     private static final String COM_GET_FI = "getf";
+
+    private static final String COM_LS_SU = "ls";
+    private static final String COM_LS_FI = "lf";
+
+    private static final String COM_HELP = "help";
+    private static final String COM_EXIT = "e";
+
+    private static void listCommands() {
+        System.out.println("List of Commands:");
+        System.out.printf("%-28s%s%n", COM_LS_SU, "Lists all storage units.");
+        System.out.printf("%-28s%s%n", COM_LS_FI, "Lists all food items.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_ADD_SU + " <name>", "Creates a storage unit with given name.");
+        System.out.printf("%-28s%s%n", COM_ADD_SU + " <name> <type>", "Creates a storage unit with given name and type.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_DEL_SU + " <name>", "Deletes a storage unit with given name.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_GET_SU + " <name>", "Displays details on storage unit with given name.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_ADD_FI + " <name>", "Creates a food item with given name and adds it to open space.");
+        System.out.printf("%-28s%s%n", COM_ADD_FI + " <name> <location>", "Creates a food item with given name and adds it to given storage unit.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_DEL_FI + " <name> <location>", "Deletes food item with given name from given storage unit.");
+        System.out.printf("%-28s%s%n", COM_DEL_FI + " <name> <id> <location>", "Deletes food item with given name and ID from given storage unit.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_GET_FI + " <name>", "Displays details for food item with given name.");
+        System.out.printf("%-28s%s%n", COM_GET_FI + " <name> <location>", "Displays details for food item with given name from given storage unit.");
+        System.out.printf("%-28s%s%n", COM_GET_FI + " <name> <id>", "Displays details for food item with given name and ID.");
+        System.out.printf("%-28s%s%n", COM_GET_FI + " <name> <id> <location>", "Displays details for food item with given name and ID from given storage unit.");
+        System.out.println();
+        System.out.printf("%-28s%s%n", COM_EXIT, "Exits What's in the Fridge.");
+        System.out.println();
+    }
 
     private static StorageUnit createStorageUnit(String name) throws IOException {
         return createStorageUnit(name, null);
@@ -72,7 +105,7 @@ public class FoodManager {
     }
 
     private static void listAllStorageUnits() {
-        System.out.println("Current storage units:\n");
+        System.out.println("Current storage units:");
         boolean empty = true;
 
         for(StorageUnit i : allStorageUnits.values()) {
@@ -226,6 +259,22 @@ public class FoodManager {
         System.out.println();
     }
 
+    private static void listAllFoodItems() {
+        Map<String, FoodItem> allFoodItems = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        for(StorageUnit i : allStorageUnits.values()) {
+            for(ArrayList<FoodItem> j : i.getFoodItems().values()) {
+                for(FoodItem k : j) {
+                    allFoodItems.put(k.getName() + k.getId() + k.getLocation(), k);
+                }
+            }
+        }
+        if(allFoodItems.values().size() == 0) {
+            System.out.println("There are no food items in storage.\n");
+            return;
+        }
+        listFoodItemsFound(new ArrayList<>(allFoodItems.values()));
+    }
+
     public static void main(String args[]) throws IOException {
         allStorageUnits = SaveManager.loadTreeMap();
 
@@ -238,16 +287,19 @@ public class FoodManager {
         String[] userCommand = new String[1];
         userCommand[0] = "-";
 
-        while(!userCommand[0].equals("e")) {
+        while(true) {
             System.out.print("Enter a command: ");
             try {
                 userCommand = userCommandBR.readLine().split(" ");
 
-                if(userCommand[0].equalsIgnoreCase("e")) {
+                if(userCommand[0].equalsIgnoreCase(COM_EXIT)) {
                     break;
 
-                } else if(userCommand[0].equalsIgnoreCase("ls")) {
+                } else if(userCommand[0].equalsIgnoreCase(COM_LS_SU)) {
                     listAllStorageUnits();
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_LS_FI)) {
+                    listAllFoodItems();
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_ADD_SU)) {
                     if(userCommand.length == 2) {
@@ -305,29 +357,32 @@ public class FoodManager {
                     }
 
                 } else if(userCommand[0].equalsIgnoreCase(COM_GET_FI)) {
-                    if(userCommand.length == 2) {
+                    if (userCommand.length == 2) {
                         displayFoodItem(userCommand[1]);
-                    } else if(userCommand.length == 3) {
+                    } else if (userCommand.length == 3) {
                         int id;
-                        try{
+                        try {
                             id = Integer.parseInt(userCommand[2]);
                             displayFoodItem(userCommand[1], id);
-                        } catch(NumberFormatException i) {
+                        } catch (NumberFormatException i) {
                             displayFoodItem(userCommand[1], userCommand[2]);
                         }
-                    } else if(userCommand.length == 4) {
+                    } else if (userCommand.length == 4) {
                         int id;
-                        try{
+                        try {
                             id = Integer.parseInt(userCommand[2]);
                             displayFoodItem(userCommand[1], id, userCommand[3]);
-                        } catch(NumberFormatException i) {
+                        } catch (NumberFormatException i) {
                             System.out.println("ID must be a number.\n");
                         }
-                    } else if(userCommand.length > 4) {
+                    } else if (userCommand.length > 4) {
                         System.out.println("Too many arguments!\n");
                     } else {
                         System.out.println("Must specify food item to display!\n");
                     }
+
+                } else if(userCommand[0].equalsIgnoreCase(COM_HELP)) {
+                    listCommands();
 
                 } else {
                     System.out.println("Invalid command. Please try again or type help for a list of commands.\n");

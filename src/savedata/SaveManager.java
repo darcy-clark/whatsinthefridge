@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import foodstorage.FoodItem;
@@ -59,6 +60,9 @@ public class SaveManager {
             foodWithSameName = (ArrayNode) foodMap.get(foodToSave.getName());
             foodWithSameName.add(foodItem);
         }
+
+        int newValue = json.get(foodToSave.getLocation()).get("numberOfItems").intValue() + 1;
+        ((ObjectNode) json.get(foodToSave.getLocation())).put("numberOfItems", newValue);
 
         mapper.writeValue(saveFile, json);
     }
