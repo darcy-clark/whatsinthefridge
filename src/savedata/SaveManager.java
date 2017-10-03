@@ -13,14 +13,24 @@ import foodstorage.StorageUnit;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class SaveManager {
 
-    private final static String PATH = "../savedata/savefiles/saveFile.json";
+    private final static String PATH = System.getenv("APPDATA") + "\\whatsInTheFridge\\saveFile.json";
     private final static String FOOD_MAP_KEY = "foodItems";
+
+    public static void createSaveFile() throws IOException {
+        File file = new File(PATH);
+        if(file.getParentFile().mkdirs() && file.createNewFile()) {
+            PrintWriter writer = new PrintWriter(PATH, "UTF-8");
+            writer.print("{}");
+            writer.close();
+        }
+    }
 
     public static Map<String, StorageUnit> loadTreeMap() throws IOException {
         File saveFile = new File(PATH);

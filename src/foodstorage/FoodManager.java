@@ -89,8 +89,8 @@ public class FoodManager {
         if(allStorageUnits.containsKey(name)) {
             StorageUnit unitToDisplay = allStorageUnits.get(name);
             System.out.println("\n" + unitToDisplay.getName());
-            System.out.println("Type:\t\t\t\t\t" + unitToDisplay.getStorageType());
-            System.out.println("Number of Food Items:\t" + unitToDisplay.getNumberOfItems() + "\n");
+            System.out.printf("%-24s%s%n", "Type:", unitToDisplay.getStorageType());
+            System.out.printf("%-24s%s%n", "Number of Food Items:", unitToDisplay.getNumberOfItems() + "\n");
             System.out.println("List of Food Items:");
             for(ArrayList<FoodItem> i : unitToDisplay.getFoodItems().values()) {
                 for(FoodItem j : i) {
@@ -276,9 +276,12 @@ public class FoodManager {
     }
 
     public static void main(String args[]) throws IOException {
+        SaveManager.createSaveFile();
+
         allStorageUnits = SaveManager.loadTreeMap();
 
         // Safe-guard in case I delete the save file contents
+        // Also run at first startup
         if(!allStorageUnits.containsKey(FREE_SPACE)) {
             createStorageUnit(FREE_SPACE);
         }
